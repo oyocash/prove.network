@@ -89,7 +89,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="document">File</label>
-                        <input type="file" id="document" class="form-control" accept='*' placeholder="Select file"/>
+                        <input type="file" id="document" class="form-control" accept='*' placeholder="Select file" multiple />
                     </div>
                     <div class="form-group">
                         <label for="hash">Hash</label>
@@ -100,8 +100,9 @@
                         <input type="text" id="fileSize" class="form-control"/>
                     </div>
                     <div class="form-group">
-                      <div id='payment-message'></div>
-                      <div id='my-money-button'></div>
+                      <div id="payment-message"></div>
+                      <div id="money-button"></div>
+                      <div id="relayx-button"></div>
                     </div>
                 </div>
             </div>
@@ -110,9 +111,10 @@
 </div>
 <div id="relayx-buy-container"></div>
 <script src="https://otc-staging.relayx.io/relayotc.js"></script>
+<script src="https://one.relayx.io/relayone.js"></script>
 <script src="https://www.moneybutton.com/moneybutton.js"></script>
 <script src="/assets/js/bsv/bsv.min.js"></script>
 <script src="/assets/js/crypto-js/crypto-js.js"></script>
-<script src="/index.js"></script>
+<script src="/index.js?1807"></script>
 </body>
 </html>

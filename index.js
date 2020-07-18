@@ -2,6 +2,7 @@ var chunkSize = 1024*1024; // bytes
 var timeout = 10; // millisec
 var collectAddress = "1L7opWPQsWxhY7FvLUzjLdeWmcybwuarPZ"
 var collectPaypail = "25614@moneybutton.com"
+var filesDoneCount = 0
 
 var inputElement = document.getElementById("document");
 inputElement.addEventListener("change", handleFiles, false);
@@ -10,7 +11,13 @@ inputElement.onclick = function(event){
 }
 
 function handleFiles() {
-    var file = this.files[0];
+  filesDoneCount = 0
+  var size = 0
+  var hashes = []
+  var filesLength = this.files.length
+
+  for (var i = 0; i < filesLength; i++) {
+    var file = this.files[i];
     if(file===undefined){
         return;
     }
@@ -20,7 +27,7 @@ function handleFiles() {
 
     var timeStart = new Date().getTime();
     var timeEnd = 0;
-    document.getElementById("fileSize").value = humanFileSize(file.size,true);
+    size += file.size
 
     loading(file,
         function (data) {
@@ -31,11 +38,26 @@ function handleFiles() {
         }, function (data) {
             //console.log('100%');
             var encrypted = SHA256.finalize().toString();
-            document.getElementById("hash").value = encrypted;
-            timeEnd = new Date().getTime();
-            showMB()
-        });
+            hashes.push(encrypted)
+            filesDoneCount++
+            if (filesDoneCount === filesLength) {
+              document.getElementById("fileSize").value = humanFileSize(size, true);
 
+              var wordBuffer2 = CryptoJS.lib.WordArray.create(hashes);
+              SHA256.update(wordBuffer2);
+              var hashesEncrypted = SHA256.finalize().toString();
+
+              if (filesLength === 1) {
+                  document.getElementById("hash").value = hashes[0];
+              } else {
+                document.getElementById("hash").value = hashesEncrypted;
+              }
+              timeEnd = new Date().getTime();
+              showMoneyButton()
+              showRelayXButton()
+            }
+        });
+  }
 };
 
 function clear(){
@@ -172,15 +194,14 @@ function relayxBuyPopup() {
     relayotc.buy('relayx-buy-container', {referrer: collectPaypail});
   }
 
-// show MB button
-function showMB() {
+// show MoneyButton button
+function showMoneyButton() {
   var name = document.getElementById('document').files.item(0).name
   var hash = document.getElementById("hash").value
   var opReturn = bsv.Script.buildSafeDataOut(['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', name, hash]).toASM()
-  console.log(opReturn)
 
-  const mbDiv = document.getElementById('my-money-button')
-  moneyButton.render(mbDiv, {
+  const buttonDiv = document.getElementById('money-button')
+  moneyButton.render(buttonDiv, {
     outputs: [{
       address: collectAddress,
       amount: "0.008",
@@ -191,12 +212,29 @@ function showMB() {
       amount: '0',
       currency: 'BSV'
     }],
-    onPayment: function (arg) { onMbPayment(arg) }
-  }
-)
+    onPayment: function (arg) { onPayment(arg) }
+  })
 }
 
-function onMbPayment(arg) {
+// show RelayX button
+function showRelayXButton() {
+  var name = document.getElementById('document').files.item(0).name
+  var hash = document.getElementById("hash").value
+  var opReturn = ['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', name, hash]
+
+  const buttonDiv = document.getElementById('relayx-button')
+  relayone.render(buttonDiv, {
+    outputs: [{
+      to: collectAddress,
+      amount: "0.008",
+      currency: "USD"
+    }],
+    opReturn: opReturn,
+    onPayment: function (arg) { onPayment(arg) }
+  })
+}
+
+function onPayment(arg) {
   document.getElementById("payment-message").innerHTML = "Transaction id of the proof: " + arg.txid;
   clear()
 }
