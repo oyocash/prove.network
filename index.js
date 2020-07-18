@@ -196,9 +196,12 @@ function relayxBuyPopup() {
 
 // show MoneyButton button
 function showMoneyButton() {
-  var name = document.getElementById('document').files.item(0).name
+  var name = []
+  for (let i = 0; i < filesDoneCount; i++) {
+    name.push(document.getElementById('document').files.item(i).name)
+  }
   var hash = document.getElementById("hash").value
-  var opReturn = bsv.Script.buildSafeDataOut(['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', name, hash]).toASM()
+  var opReturn = bsv.Script.buildSafeDataOut(['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', JSON.stringify(name), hash]).toASM()
 
   const buttonDiv = document.getElementById('money-button')
   moneyButton.render(buttonDiv, {
@@ -218,9 +221,12 @@ function showMoneyButton() {
 
 // show RelayX button
 function showRelayXButton() {
-  var name = document.getElementById('document').files.item(0).name
+  var name = []
+  for (let i = 0; i < filesDoneCount; i++) {
+    name.push(document.getElementById('document').files.item(i).name)
+  }
   var hash = document.getElementById("hash").value
-  var opReturn = ['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', name, hash]
+  var opReturn = ['1MSeMPLoDvgQr2ZKgXEM3GDU7hxUnsRyRw', JSON.stringify(name), hash]
 
   const buttonDiv = document.getElementById('relayx-button')
   relayone.render(buttonDiv, {
